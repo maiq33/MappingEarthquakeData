@@ -12,30 +12,45 @@ let mapZoom = 2;
 let earthquakes;
 
 function preload(){
-    earthquakes = loadStrings("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.csv")
+    earthquakes = loadStrings("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.csv")
 }
 
 function setup(){
     noCanvas(); // Como no vamos a dibujar con p5.js en este caso
     initMap();  // Inicializar el mapa
 
-    // Agregar un círculo a las coordenadas de Shanghai
+
+
+    for (let i = 1; i < earthquakes.length; i++) {
+        let data = earthquakes[i].split(/,/);
+        print(data);
+
+        let lat = parseFloat(data[1]);
+        let lon = parseFloat(data[2]);
+        let mag = parseFloat(data[4]);
+
+        mag = pow(mag, 10);
+        mag = sqrt(mag);
+
+        if (isNaN(lat) || isNaN(lon)) {
+            continue;  // Si las coordenadas no son válidas, salta al siguiente ciclo del bucle
+        }
+
+    // Agregar un círculo a las coordenadas
     L.circle([lat, lon], {
         color: 'magenta',
         fillColor: 'magenta',
         fillOpacity: 0.5,
-        radius: 50000  // radio en metros, puedes ajustar según necesites
+        radius: mag * 10  // radio en metros, puedes ajustar según necesites
     }).addTo(leafletMap);
-
-    for (let i = 0; i < earthquakes.length; i++) {
-        let data = earthquakes[i].split(/,/);
-        print(data);
-        
+       
     }
+
+
 }
 
 function mercX(lon){
-    lon = radiasn(lon);
+    lon = radians(lon);
     let a = (256 / PI) * pow(2,mapZoom);
     let b = a + PI;
     return a * b;
